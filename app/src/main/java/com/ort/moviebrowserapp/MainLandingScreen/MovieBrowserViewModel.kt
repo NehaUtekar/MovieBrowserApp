@@ -15,27 +15,23 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 
-class MovieBrowserViewModel(var activity: Activity,var pageNo:Int):ViewModel(){
+class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:String?):ViewModel(){
 
     private val movieList: MutableLiveData<MutableList<ResultPojo>> = MutableLiveData()
     private var mutableMovieList:MutableList<ResultPojo> = ArrayList()
 
-    fun getMovieList(): LiveData<MutableList<ResultPojo>> {
-        loadMovieList(activity.getString(R.string.api_key),pageNo)
+     fun getMovieList(): LiveData<MutableList<ResultPojo>> {
+        loadMovieList(activity.getString(R.string.api_key),pageNo,sortBy)
         return movieList
     }
 
-     fun loadMovieList(apiKey:String, pageNo: Int) {
+     fun loadMovieList(apiKey:String, pageNo: Int, sortBy: String?) {
       try {
-          RetrofitConfiguration.apiManagement()!!.getMovieList(apiKey,pageNo)!!
+          RetrofitConfiguration.apiManagement()!!.getMovieList(apiKey,pageNo,sortBy)!!
               .enqueue(object : Callback<MovieBrowserResponsePojo?> {
                   override fun onFailure(call: Call<MovieBrowserResponsePojo?>?, t: Throwable?) {
                       Log.e("TAG","Inside Failure")
-                      when(activity)
-                      {
-                          SplashScreenActivity()-> (activity as SplashScreenActivity).fail(t)
-                          MovieBrowserActivity()-> (activity as MovieBrowserActivity).fail(t)
-                      }
+                      if(activity is MovieBrowserActivity) (activity as MovieBrowserActivity).fail(t)
                   }
 
                   override fun onResponse(
@@ -43,7 +39,10 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int):ViewModel(){
                       response: Response<MovieBrowserResponsePojo?>?) {
                       if(response!!.isSuccessful)
                       {
-                          if(mutableMovieList.isNullOrEmpty()) mutableMovieList = response.body()!!.results!!.toMutableList()
+                          if((mutableMovieList.isNullOrEmpty()||!sortBy.isNullOrEmpty())&& pageNo==1)
+                          {
+                              mutableMovieList = response.body()!!.results!!.toMutableList()
+                          }
                           else mutableMovieList.addAll(movieList.value!!.size,response.body()!!.results!!)
                           movieList.postValue(mutableMovieList)
                       }
@@ -55,4 +54,8 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int):ViewModel(){
          e.printStackTrace()
       }
     }
+
+
+
+
 }

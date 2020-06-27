@@ -11,5 +11,6 @@ interface APIManagement {
     //call to get default movie list
     @GET("discover/movie")
     fun getMovieList(@Query("api_key") api_key: String?,
-                     @Query("page") pageNo:Int): Call<MovieBrowserResponsePojo?>?
+                     @Query("page") pageNo:Int,
+                     @Query("sort_by") sortBy:String?): Call<MovieBrowserResponsePojo?>?
 }
