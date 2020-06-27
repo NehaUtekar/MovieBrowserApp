@@ -10,7 +10,7 @@ import com.ort.moviebrowserapp.R
 import com.ort.moviebrowserapp.pojo.MovieBrowserResponsePojo
 
 
-class SplashScreenActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowserResponsePojo> {
+class SplashScreenActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,22 +20,6 @@ class SplashScreenActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
            startActivity(Intent(this,MovieBrowserActivity::class.java))
             finish()
         }, 1000)
-    }
-
-    override fun noInternet() {}
-
-    override fun success(response: MovieBrowserResponsePojo?) {}
-
-    override fun fail(error:Throwable?) {
-     /*   hideLoading()
-        Toast.makeText(this,"Something Went Wrong",Toast.LENGTH_SHORT).show()
-        llRetry.visibility = View.VISIBLE*/
-    }
-
-    override fun showLoading() {}
-
-    override fun hideLoading() {
-       // llProgresBar.visibility = View.GONE
     }
 
 
