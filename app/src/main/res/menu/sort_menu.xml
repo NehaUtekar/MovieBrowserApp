@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter_icon_white"
+        android:title="Sort"
+        app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/sort_popularity_aesc"
+                android:title="Sort By Popularity Ascending" />
+            <item android:id="@+id/sort_popularity_desc"
+                android:title="Sort By Popularity Descending" />
+            <item android:id="@+id/sort_rating_aesc"
+                android:title="Sort By Ratings Ascending" />
+            <item android:id="@+id/sort_rating_desc"
+                android:title="Sort By Rating Descending" />
+
+        </menu>
+    </item>
+</menu>
