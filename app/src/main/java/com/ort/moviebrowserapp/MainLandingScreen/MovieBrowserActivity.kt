@@ -3,6 +3,7 @@ package com.ort.moviebrowserapp.MainLandingScreen
 import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,13 +18,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ort.moviebrowserapp.APIConfiguration.ApiResponseHandler
+import com.ort.moviebrowserapp.MovieDetailsScreen.MovieDetailsActivity
 import com.ort.moviebrowserapp.R
 import com.ort.moviebrowserapp.pojo.MovieBrowserResponsePojo
 import com.ort.moviebrowserapp.pojo.ResultPojo
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowserResponsePojo> {
+class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowserResponsePojo>,OnItemClickListener{
 
     var gridLayoutManager: GridLayoutManager? = null
     var movieList: List<ResultPojo>? = null
@@ -37,13 +39,17 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //set action bar
+        with(supportActionBar!!) {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)}
 
         //set up recyclerview
         gridLayoutManager = GridLayoutManager(this, 2)
         rvMoviesPoster.layoutManager = gridLayoutManager
         movieList = ArrayList()
 
-        var movieAdapter = MovieBrowserAdapter(this, movieList!!)
+        var movieAdapter = MovieBrowserAdapter(this, movieList!!,this)
         rvMoviesPoster.adapter = movieAdapter
         rvMoviesPoster.addOnScrollListener(recyclerViewOnScrollListener!!)
 
@@ -66,7 +72,7 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
                 rvMoviesPoster.visibility = View.VISIBLE
                 tvNoMoviesFound.visibility = View.GONE
                 movieList = it
-                movieAdapter = MovieBrowserAdapter(this, movieList!!)
+                movieAdapter = MovieBrowserAdapter(this, movieList!!,this)
                 rvMoviesPoster.adapter = movieAdapter
                 rvMoviesPoster.scrollToPosition(lastIndexBeforePagination)
             }
@@ -141,6 +147,11 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //back button
+        if(item.itemId==android.R.id.home)
+        {
+            onBackPressed()
+        }
         pageNo =1
         model!!.pageNo = pageNo
         if (model != null) {
@@ -205,6 +216,13 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MovieBrowserViewModel(activity, pageNo, sortBy,searchQuery) as T
         }
+    }
+
+    //implement inreface to provide onclick listener
+    override fun onMovieSelectedListener(movieId: Long) {
+        val movieIntent = Intent(this,MovieDetailsActivity::class.java)
+        movieIntent.putExtra("MOVIE_ID",movieId)
+        startActivity(movieIntent)
     }
 
 

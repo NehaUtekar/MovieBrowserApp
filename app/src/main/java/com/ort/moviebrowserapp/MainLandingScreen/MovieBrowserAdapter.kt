@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.ort.moviebrowserapp.R
 import com.ort.moviebrowserapp.pojo.ResultPojo
 
-class MovieBrowserAdapter(var context:Context, var movieList:List<ResultPojo>):
+class MovieBrowserAdapter(var context:Context, var movieList:List<ResultPojo>, var movieBrowserActivity: MovieBrowserActivity):
     RecyclerView.Adapter<MovieBrowserAdapter.MovieBrowserViewHolder>() {
 
 
@@ -34,6 +35,11 @@ class MovieBrowserAdapter(var context:Context, var movieList:List<ResultPojo>):
         Glide.with(context)
             .load(url)
             .into(holder.ivMoviePoster);
+
+        //setOnClicl listener
+        holder.rlMoviePoster.setOnClickListener(){
+            movieBrowserActivity.onMovieSelectedListener(movieList[position].id)
+        }
     }
 
 
@@ -45,6 +51,7 @@ class MovieBrowserAdapter(var context:Context, var movieList:List<ResultPojo>):
         val tvRating = item.findViewById<AppCompatTextView>(R.id.tvMovieRatings)
         val tvMovieName = item.findViewById<AppCompatTextView>(R.id.tvMovieName)
         val tvReleaseDate = item.findViewById<AppCompatTextView>(R.id.tvMovieReleaseDate)
+        val rlMoviePoster = item.findViewById<RelativeLayout>(R.id.rlMoviePoster)
 
     }
 }
