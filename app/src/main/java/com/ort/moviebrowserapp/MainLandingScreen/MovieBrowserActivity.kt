@@ -2,6 +2,9 @@ package com.ort.moviebrowserapp.MainLandingScreen
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,14 +20,14 @@ import com.ort.moviebrowserapp.pojo.ResultPojo
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowserResponsePojo> {
+class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowserResponsePojo> {
 
-    var gridLayoutManager:GridLayoutManager? =null
-    var movieList:List<ResultPojo>? = null
-    var  model: MovieBrowserViewModel?= null
-    var  viewModelFactory: MyViewModelFactory?= null
-    var  isDataLoading:Boolean = false
-    var pageNo =1
+    var gridLayoutManager: GridLayoutManager? = null
+    var movieList: List<ResultPojo>? = null
+    var model: MovieBrowserViewModel? = null
+    var viewModelFactory: MyViewModelFactory? = null
+    var isDataLoading: Boolean = false
+    var pageNo = 1
     var lastIndexBeforePagination = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,26 +36,27 @@ class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowser
 
 
         //set up recyclerview
-        gridLayoutManager = GridLayoutManager(this,2)
+        gridLayoutManager = GridLayoutManager(this, 2)
         rvMoviesPoster.layoutManager = gridLayoutManager
         movieList = ArrayList()
 
-        var movieAdapter = MovieBrowserAdapter(this,movieList!!)
+        var movieAdapter = MovieBrowserAdapter(this, movieList!!)
         rvMoviesPoster.adapter = movieAdapter
         rvMoviesPoster.addOnScrollListener(recyclerViewOnScrollListener!!)
 
 
         //configure  view model
-        viewModelFactory = MyViewModelFactory(this,pageNo)
-        model= ViewModelProvider(this,viewModelFactory!!).get(MovieBrowserViewModel(this,pageNo)::class.java)
+        viewModelFactory = MyViewModelFactory(this, pageNo, null)
+        model = ViewModelProvider(this, viewModelFactory!!).get(
+            MovieBrowserViewModel(this, pageNo, null)::class.java
+        )
         //start loading
         showLoading()
-        model!!.getMovieList().observe(this, Observer<MutableList<ResultPojo>>{
+        model!!.getMovieList().observe(this, Observer<MutableList<ResultPojo>> {
             hideLoading()
-            if(it.isNotEmpty())
-            {
+            if (it.isNotEmpty()) {
                 movieList = it
-                movieAdapter = MovieBrowserAdapter(this,movieList!!)
+                movieAdapter = MovieBrowserAdapter(this, movieList!!)
                 rvMoviesPoster.adapter = movieAdapter
                 rvMoviesPoster.scrollToPosition(lastIndexBeforePagination)
             }
@@ -63,16 +67,16 @@ class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowser
 
     override fun success(response: MovieBrowserResponsePojo?) {}
 
-    override fun fail(error:Throwable?) {
+    override fun fail(error: Throwable?) {
         hideLoading()
-        Toast.makeText(this,"Something Went Wrong", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_SHORT).show()
         rvMoviesPoster.visibility = View.GONE
         llRetry.visibility = View.VISIBLE
     }
 
     override fun showLoading() {
         isDataLoading = true
-        if(llRetry.visibility == View.VISIBLE) llRetry.visibility = View.GONE
+        if (llRetry.visibility == View.VISIBLE) llRetry.visibility = View.GONE
         llProgresBar.visibility = View.VISIBLE
     }
 
@@ -82,6 +86,44 @@ class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowser
     }
 
 
+    //to imflate sort menu option
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.sort_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        pageNo =1
+        model!!.pageNo = pageNo
+        if (model != null) {
+            return when (item.itemId) {
+                R.id.sort_popularity_aesc -> {
+                    model!!.sortBy = "popularity.asc"
+                    model!!.getMovieList()
+                    true
+                }
+                R.id.sort_popularity_desc -> {
+                    model!!.sortBy = "popularity.desc"
+                    model!!.getMovieList()
+                    true
+                }
+                R.id.sort_rating_aesc -> {
+                    model!!.sortBy = "vote_average.asc"
+                    model!!.getMovieList()
+                    true
+                }
+                R.id.sort_rating_desc -> {
+                    model!!.sortBy = "vote_average.desc"
+                    model!!.getMovieList()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     //RecyclerViewListener
     private var recyclerViewOnScrollListener: RecyclerView.OnScrollListener? =
@@ -94,14 +136,14 @@ class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowser
                 super.onScrolled(recyclerView, dx, dy)
                 val visibleItemCount: Int = gridLayoutManager!!.getChildCount()
                 val totalItemCount: Int = gridLayoutManager!!.getItemCount()
-                val firstVisibleItemPosition: Int = gridLayoutManager!!.findFirstVisibleItemPosition()
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && !isDataLoading)
-                {
-                    lastIndexBeforePagination =totalItemCount
+                val firstVisibleItemPosition: Int =
+                    gridLayoutManager!!.findFirstVisibleItemPosition()
+                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && !isDataLoading) {
+                    lastIndexBeforePagination = totalItemCount
                     showLoading()
                     pageNo++
                     //to load next data
-                    viewModelFactory!!.pageNo = pageNo
+                   // viewModelFactory!!.pageNo = pageNo
                     model!!.pageNo = pageNo
                     model!!.getMovieList()
 
@@ -110,9 +152,10 @@ class MovieBrowserActivity : AppCompatActivity(),ApiResponseHandler<MovieBrowser
         }
 
     //created view model factory for passing custome parameters to ViewModel
-    class MyViewModelFactory(private val activity: Activity,var pageNo:Int): ViewModelProvider.NewInstanceFactory() {
-        override fun <T: ViewModel> create(modelClass:Class<T>): T {
-            return MovieBrowserViewModel(activity,pageNo) as T
+    class MyViewModelFactory(private val activity: Activity, var pageNo: Int, var sortBy: String?) :
+        ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return MovieBrowserViewModel(activity, pageNo, sortBy) as T
         }
     }
 
