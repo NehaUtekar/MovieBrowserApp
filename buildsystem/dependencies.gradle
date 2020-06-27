@@ -1,0 +1,20 @@
+ext {
+    rxJavaVersion = '1.1.5'
+    rxAndroidVersion = '1.2.0'
+    retrofitVersion = '2.0.2'
+    googleGson = '2.8.2'
+    okHttpLoggingVersion = '3.3.1'
+    sdpVersion= '1.0.5'
+
+    appDependencies = [
+
+            ////////  THIRD PARTY LIBRARIES ////////////////////////////
+            rxAndroid            : "io.reactivex:rxandroid:${rxAndroidVersion}",
+            rxJava               : "io.reactivex:rxjava:${rxJavaVersion}",
+            retrofit             : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            retrofitGsonConverter: "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+            retrofitRxJavaAdapter: "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+            okHttpLogging        : "com.squareup.okhttp3:logging-interceptor:${okHttpLoggingVersion}",
+            sdp                  : "com.intuit.sdp:sdp-android:${sdpVersion}"
+    ]
+}
