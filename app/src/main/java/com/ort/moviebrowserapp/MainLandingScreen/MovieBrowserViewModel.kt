@@ -2,12 +2,14 @@ package com.ort.moviebrowserapp.MainLandingScreen
 
 import android.app.Activity
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ort.moviebrowserapp.APIConfiguration.RetrofitConfiguration
 import com.ort.moviebrowserapp.R
 import com.ort.moviebrowserapp.pojo.MovieBrowserResponsePojo
+import com.ort.moviebrowserapp.pojo.MovieDetailsPojo
 import com.ort.moviebrowserapp.pojo.ResultPojo
 import com.ort.moviebrowserapp.splashScreen.SplashScreenActivity
 import retrofit2.Call
@@ -21,9 +23,18 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:St
      var mutableMovieList:MutableList<ResultPojo> = ArrayList()
      var searchResultList:MutableList<ResultPojo> = ArrayList()
 
+    //to fetch movie details
+     var movieId:Long = 0
+     var mutableMovieDetails: MutableLiveData<MovieDetailsPojo>? = MutableLiveData()
+
      fun getMovieList(): LiveData<MutableList<ResultPojo>> {
         loadMovieList(activity.getString(R.string.api_key))
         return movieList
+    }
+
+    fun getMovieDetails(): MutableLiveData<MovieDetailsPojo>? {
+        loadMovieDetails(activity.getString(R.string.api_key))
+        return mutableMovieDetails
     }
 
     fun getSearchResult(): LiveData<MutableList<ResultPojo>> {
@@ -60,6 +71,7 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:St
       }
     }
 
+    //to get search result
     fun loadSearchResult(apiKey: String)
     {
         RetrofitConfiguration.apiManagement()!!.getSearchResult(apiKey,searchQuery)!!
@@ -81,6 +93,22 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:St
     }
 
 
-
-
+    //to load movie details
+    fun loadMovieDetails(apiKey: String)
+    {
+        RetrofitConfiguration.apiManagement()!!.getMovieDetails(movieId,apiKey)!!
+            .enqueue(object : Callback<MovieDetailsPojo?> {
+                override fun onFailure(call: Call<MovieDetailsPojo?>?, t: Throwable?) {
+                    Log.d("TAG","OnFailure")
+                }
+                override fun onResponse(
+                    call: Call<MovieDetailsPojo?>?,
+                    response: Response<MovieDetailsPojo?>?) {
+                    if(response!!.isSuccessful)
+                    {
+                        mutableMovieDetails!!.postValue(response.body())
+                    }
+                }
+            })
+    }
 }
