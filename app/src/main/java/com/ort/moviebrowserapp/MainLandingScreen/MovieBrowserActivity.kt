@@ -1,11 +1,14 @@
 package com.ort.moviebrowserapp.MainLandingScreen
 
 import android.app.Activity
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -46,15 +49,22 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
 
 
         //configure  view model
-        viewModelFactory = MyViewModelFactory(this, pageNo, null)
+        viewModelFactory = MyViewModelFactory(this, pageNo, null,null)
         model = ViewModelProvider(this, viewModelFactory!!).get(
-            MovieBrowserViewModel(this, pageNo, null)::class.java
+            MovieBrowserViewModel(this, pageNo, null,null)::class.java
         )
         //start loading
         showLoading()
         model!!.getMovieList().observe(this, Observer<MutableList<ResultPojo>> {
             hideLoading()
-            if (it.isNotEmpty()) {
+            if (model!!.searchQuery!=null && it.isEmpty()) {
+                rvMoviesPoster.visibility = View.GONE
+                tvNoMoviesFound.visibility = View.VISIBLE
+            }
+            else if(it.isNotEmpty())
+            {
+                rvMoviesPoster.visibility = View.VISIBLE
+                tvNoMoviesFound.visibility = View.GONE
                 movieList = it
                 movieAdapter = MovieBrowserAdapter(this, movieList!!)
                 rvMoviesPoster.adapter = movieAdapter
@@ -90,8 +100,45 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.sort_menu, menu)
+
+        // Associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu!!.findItem(R.id.action_search).actionView as SearchView).apply {
+
+            setOnCloseListener (object :SearchView.OnCloseListener{
+                override fun onClose(): Boolean {
+                    model!!.mutableMovieList.clear()
+                    model!!.searchQuery = null
+                    model!!.getMovieList()
+                    return  true
+                }
+            })
+            setOnQueryTextListener(object:SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    //Toast.makeText(this@MovieBrowserActivity,"Query Submitted",Toast.LENGTH_SHORT).show()
+                    model!!.searchResultList.clear()
+                    model!!.searchQuery = p0!!
+                    model!!.getSearchResult()
+                    return true
+                }
+
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    if((p0!!.isEmpty() && model!!.searchResultList.isNotEmpty())||(p0.isEmpty()&&tvNoMoviesFound.visibility==View.VISIBLE))
+                    {
+                        model!!.mutableMovieList.clear()
+                        model!!.searchQuery = null
+                        model!!.getMovieList()
+                    }
+                  return  true
+                }
+
+            })
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        }
+
         return true
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         pageNo =1
@@ -152,10 +199,11 @@ class MovieBrowserActivity : AppCompatActivity(), ApiResponseHandler<MovieBrowse
         }
 
     //created view model factory for passing custome parameters to ViewModel
-    class MyViewModelFactory(private val activity: Activity, var pageNo: Int, var sortBy: String?) :
+    class MyViewModelFactory(private val activity: Activity, var pageNo: Int,
+                             var sortBy: String?,var searchQuery:String?) :
         ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MovieBrowserViewModel(activity, pageNo, sortBy) as T
+            return MovieBrowserViewModel(activity, pageNo, sortBy,searchQuery) as T
         }
     }
 

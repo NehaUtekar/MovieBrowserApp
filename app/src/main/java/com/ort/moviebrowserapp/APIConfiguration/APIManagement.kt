@@ -13,4 +13,11 @@ interface APIManagement {
     fun getMovieList(@Query("api_key") api_key: String?,
                      @Query("page") pageNo:Int,
                      @Query("sort_by") sortBy:String?): Call<MovieBrowserResponsePojo?>?
+
+    //to get search result
+    @GET("search/movie")
+    fun getSearchResult(@Query("api_key") api_key: String?,
+                    @Query("query") searchQuery:String?): Call<MovieBrowserResponsePojo?>?
+
+
 }

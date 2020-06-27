@@ -2,21 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--Menu For Searching-->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/search_menu"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="collapseActionView|always" />
+
+    <!--menu for sorting-->
     <item
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_filter_icon_white"
-        android:title="Sort"
+        android:title="@string/sort_menu_name"
         app:showAsAction="always">
         <menu>
             <item android:id="@+id/sort_popularity_aesc"
-                android:title="Sort By Popularity Ascending" />
+                android:title="@string/sort_by_popularity_ascending" />
             <item android:id="@+id/sort_popularity_desc"
-                android:title="Sort By Popularity Descending" />
+                android:title="@string/sort_by_popularity_descending" />
             <item android:id="@+id/sort_rating_aesc"
-                android:title="Sort By Ratings Ascending" />
+                android:title="@string/sort_by_ratings_ascending" />
             <item android:id="@+id/sort_rating_desc"
-                android:title="Sort By Rating Descending" />
+                android:title="@string/sort_by_rating_descending" />
 
         </menu>
     </item>
+
+
 </menu>

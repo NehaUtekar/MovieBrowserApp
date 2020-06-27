@@ -15,22 +15,27 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 
-class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:String?):ViewModel(){
+class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:String?,var searchQuery:String?):ViewModel(){
 
     private val movieList: MutableLiveData<MutableList<ResultPojo>> = MutableLiveData()
-    private var mutableMovieList:MutableList<ResultPojo> = ArrayList()
+     var mutableMovieList:MutableList<ResultPojo> = ArrayList()
+     var searchResultList:MutableList<ResultPojo> = ArrayList()
 
      fun getMovieList(): LiveData<MutableList<ResultPojo>> {
-        loadMovieList(activity.getString(R.string.api_key),pageNo,sortBy)
+        loadMovieList(activity.getString(R.string.api_key))
         return movieList
     }
 
-     fun loadMovieList(apiKey:String, pageNo: Int, sortBy: String?) {
+    fun getSearchResult(): LiveData<MutableList<ResultPojo>> {
+        loadSearchResult(activity.getString(R.string.api_key))
+        return movieList
+    }
+
+     fun loadMovieList(apiKey:String) {
       try {
           RetrofitConfiguration.apiManagement()!!.getMovieList(apiKey,pageNo,sortBy)!!
               .enqueue(object : Callback<MovieBrowserResponsePojo?> {
                   override fun onFailure(call: Call<MovieBrowserResponsePojo?>?, t: Throwable?) {
-                      Log.e("TAG","Inside Failure")
                       if(activity is MovieBrowserActivity) (activity as MovieBrowserActivity).fail(t)
                   }
 
@@ -53,6 +58,26 @@ class MovieBrowserViewModel(var activity: Activity,var pageNo:Int, var sortBy:St
       catch (e:Exception){
          e.printStackTrace()
       }
+    }
+
+    fun loadSearchResult(apiKey: String)
+    {
+        RetrofitConfiguration.apiManagement()!!.getSearchResult(apiKey,searchQuery)!!
+            .enqueue(object : Callback<MovieBrowserResponsePojo?> {
+                override fun onFailure(call: Call<MovieBrowserResponsePojo?>?, t: Throwable?) {
+                    if(activity is MovieBrowserActivity) (activity as MovieBrowserActivity).fail(t)
+                }
+                override fun onResponse(
+                    call: Call<MovieBrowserResponsePojo?>?,
+                    response: Response<MovieBrowserResponsePojo?>?) {
+                    if(response!!.isSuccessful)
+                    {
+                        searchResultList = response.body()!!.results!!.toMutableList()
+                        movieList.postValue(searchResultList)
+                    }
+                }
+
+            })
     }
 
 

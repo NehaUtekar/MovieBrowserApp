@@ -57,4 +57,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNoMoviesFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/_15sdp"
+        android:gravity="center"
+        android:padding="@dimen/_5sdp"
+        android:textStyle="italic|bold"
+        android:text="There are no movies that matched your query."
+        android:visibility="gone"/>
+
 </RelativeLayout>

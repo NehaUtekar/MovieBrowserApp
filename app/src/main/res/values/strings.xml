@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">MovieBrowserApp</string>
     <string name="api_key">7cbbc853e4517d5b1d75b3950a22a5bc</string>
+    <string name="sort_by_popularity_ascending">Sort By Popularity Ascending</string>
+    <string name="sort_by_popularity_descending">Sort By Popularity Descending</string>
+    <string name="sort_by_ratings_ascending">Sort By Ratings Ascending</string>
+    <string name="sort_by_rating_descending">Sort By Rating Descending</string>
+    <string name="sort_menu_name">Sort</string>
+    <string name="search_menu">Search</string>
+    <string name="search_hint">Search Movie</string>
 </resources>
