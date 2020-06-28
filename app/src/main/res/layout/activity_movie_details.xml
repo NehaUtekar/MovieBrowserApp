@@ -29,7 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_weight="70">
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvMovieTitle"
@@ -45,16 +45,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:weightSum="10">
+
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvReleaseDate"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/_3sdp"
-                        android:textSize="@dimen/_12sdp"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:layout_weight="6"
+                        android:padding="@dimen/_3sdp"
                         android:textColor="@color/colorDarkGrey"
-                        android:textStyle="bold"
-                        android:layout_weight="5" />
+                        android:textSize="@dimen/_12sdp"
+                        android:textStyle="bold" />
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvMovieRunTime"
                         android:layout_width="0dp"
@@ -64,7 +65,7 @@
                         android:layout_gravity="center"
                         android:textColor="@color/colorDarkGrey"
                         android:textStyle="bold"
-                        android:layout_weight="5" />
+                        android:layout_weight="4" />
                 </LinearLayout>
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvMovieTagLine"
