@@ -44,7 +44,7 @@ class MovieDetailsActivity : AppCompatActivity(),ApiResponseHandler<MovieDetails
             val url = "https://image.tmdb.org/t/p/w220_and_h330_face"+it.posterPath
             Glide.with(this).load(url).into(ivMoviePosterImg)
             tvMovieTitle.text = it.title
-            tvReleaseDate.text = it.releaseDate+"  ("+it.originalLanguage+")"
+            tvReleaseDate.text = it.releaseDate+"  ("+it.originalLanguage.toUpperCase()+")"
             val timeInHour:String = (it.runtime?.div(60)).toString()
             tvMovieRunTime.text = timeInHour+"h"+" "+ (it.runtime?.rem(60)).toString()+"m"
             tvRatingsData.text = (it.voteAverage?.times(10)).toString()+"%"
